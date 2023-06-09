@@ -1,0 +1,868 @@
+<html>
+<head>
+<style>
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: calc(100vh - 90px); /* adjusting the height according to the height of the option-container and its margin */
+}
+
+.chatbox-page {
+  display: none;
+  height: 100%;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  font-size: 2em;
+}
+
+.chatbox-page.active {
+  display: flex;
+}
+
+.option-container {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    background-color: #c7c7c7;
+    width: 500px;
+    height: 60px;
+    color: white;
+    z-index: 1;
+    border-radius: 15px;
+    padding: 5px;
+    margin-bottom: 20px;
+}
+
+.option-slider {
+  position: absolute;
+  left: 0;
+  width: 115px;
+  height: 50px;
+  background-color: #5d5e5e;
+  transition: left 0.3s;
+  z-index: 2;
+  border-radius: 15px;
+  margin-left: 5px;
+  margin-right: 5px !important;
+}
+
+.option {
+  width: 125px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 3;
+}
+    /* CSS styles for the container */
+    .container-chatbox {
+      min-height: 100%;
+      max-height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      overflow: hidden;
+      border-radius: 20px;
+    }
+    
+    /* CSS for the chatbox */      
+    .chatbox {
+      overflow-x: auto; /* Add this line */
+      height: 100%; /* Adjust height based on topbar and input field heights */
+        
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 10px;
+        background-color: #f0f0f0;
+        margin-bottom: 20px;
+        margin-top: 20px;
+      }
+
+      /* Scrollbar thumb */
+      ::-webkit-scrollbar-thumb {
+        background-color: #888; /* Adjust the color of the scrollbar thumb */
+        border-radius: 5px; /* Adjust the border radius of the scrollbar thumb */
+      }
+
+      /* Scrollbar track */
+      ::-webkit-scrollbar-track {
+        margin-right: 8px; /* Add a margin on the right side of the scrollbar track */
+        background-color: #5e5d5d; /* Adjust the background color of the scrollbar track */
+      }
+
+      /* Scrollbar thumb positioning */
+      ::-webkit-scrollbar-thumb:vertical {
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Scrollbar thumb pseudo-element */
+      ::-webkit-scrollbar-thumb:vertical::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: -8px; /* Adjust the margin on the right side of the scrollbar */
+        bottom: 0;
+        width: 8px;
+        background-color: #f0f0f0; /* Adjust the background color of the scrollbar thumb */
+      }
+
+      /* Scrollbar thumb pseudo-element */
+      ::-webkit-scrollbar-thumb:vertical::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: -8px; /* Adjust the margin on the right side of the scrollbar */
+        bottom: 0;
+        width: 8px;
+        background-color: #888; /* Adjust the color of the scrollbar thumb */
+        border-radius: 5px; /* Adjust the border radius of the scrollbar thumb */
+      }
+       /* Custom scrollbar */
+      &::-webkit-scrollbar {
+        width: 10px;
+        background-color: #f0f0f0;
+      }
+
+      /* Scrollbar thumb */
+      &::-webkit-scrollbar-thumb {
+        background-color: #888; /* Adjust the color of the scrollbar thumb */
+        border-radius: 5px; /* Adjust the border radius of the scrollbar thumb */
+      }
+
+      /* Scrollbar track */
+      &::-webkit-scrollbar-track {
+        margin-right: 8px; /* Add a margin on the right side of the scrollbar track */
+        background-color: #5e5d5d; /* Adjust the background color of the scrollbar track */
+        margin-right: 3px;
+      }
+
+      /* Scrollbar thumb positioning */
+      &::-webkit-scrollbar-thumb:vertical {
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Scrollbar thumb pseudo-element */
+      &::-webkit-scrollbar-thumb:vertical::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: -8px; /* Adjust the margin on the right side of the scrollbar */
+        bottom: 0;
+        width: 8px;
+        background-color: #f0f0f0; /* Adjust the background color of the scrollbar thumb */
+      }
+
+      /* Scrollbar thumb pseudo-element */
+      &::-webkit-scrollbar-thumb:vertical::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: -8px; /* Adjust the margin on the right side of the scrollbar */
+        bottom: 0;
+        width: 8px;
+        background-color: #888; /* Adjust the color of the scrollbar thumb */
+        border-radius: 5px; /* Adjust the border radius of the scrollbar thumb */
+      }
+    }
+
+    /* CSS styles for the left container */
+    .left-container {
+      flex: 1;
+      background-color: #5e5d5d;
+      border: 3px solid #5e5d5d;
+      border-right: 20px solid white;
+      border-right: none;
+      border-radius: 20px 0 0 20px;
+      flex-direction: column;
+    }
+    
+/* CSS styles for the legend select page */
+    .legend-select, .teacher-select {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
+    
+    .legend-select button, 
+    .teacher-select button {
+      padding: 50px;
+      font-size: 1em;
+      width: 100%;
+      color: white;
+      background-color: rgb(94, 93, 93, 0.1);
+      border-top: 1px solid #5e5d5d;
+      border-bottom: 1px solid #5e5d5d;      
+      border-radius: 0;
+      cursor: pointer;
+      margin-bottom: 10px;
+      position: relative;
+      transition: transform 0.3s ease-out;
+      overflow: hidden;
+    }
+    
+    .legend-select button::before {
+      content: "";
+      position: absolute;
+      color: #5e5d5d;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    
+    .legend-select button:hover {
+      background-color: #5e5d5d;
+      color: white ;
+    }
+    
+    .legend-select button:hover::before {
+      color: #5e5d5d;
+    }
+    /* CSS styles for the right container (chatbox) */
+    .right-container {
+      flex: 4;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      justify-content: flex-start; 
+      overflow-x: hidden;
+      border: 4px solid #5e5d5d;
+      background-color: #5e5d5d;
+      position: relative;
+    }
+    /* Legend Name topbar */
+    .legend-topbar,
+    .teacher-topbar{
+        width: 100%;
+        height: 120px;
+        padding-left: 30px;
+        align-items: center;
+        display: flex;
+        border-bottom: 3px solid white;
+        color: white;
+        font-weight: 500;
+        font-size: 1em;
+        margin-bottom: 20px;
+    }
+
+    .legend-topbar-profile-picture,
+    .teacher-topbar-profile-picture {
+        height: 75px;
+        width: 75px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 20px;
+    }
+
+    /* CSS styles for the messages */
+    .message {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      line-height: 1.5em;
+    }
+
+    .message.user {
+      justify-content: flex-end;
+      text-align: left;
+    }
+
+    .message.legend,
+    .message.teacher {
+      justify-content: flex-start;
+    }
+
+    .message .user-profile-pic-container,
+    .message .legend-profile-pic-container,
+    .message .teacher-profile-pic-container {
+      width: 100px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+
+    .message .user-profile-pic,
+    .message .legend-profile-pic,
+    .message .teacher-profile-pic {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .text {
+      margin-top: 14px;
+      color:#5e5d5d;
+      background-color: #e6e6e6;
+      padding: 20px;
+      border-radius: 10px;
+      word-wrap: break-word;
+      max-width: 70%;
+      font-size: 1.5em;
+      line-height: 1.5em;
+    }
+
+    /* CSS styles for the input field and send button */
+    .input-container {
+      display: flex;
+    }
+
+    .input-field {
+      flex: 1;
+      padding: 5px;
+      margin-right: 20px;
+      transition: 0s !important;
+      background-color: #5e5d5d !important;
+      border: none !important;
+      color: white !important;
+    }
+
+    .input-field:active {
+      background-color: #5e5d5d !important;
+      border: none !important;
+      color: white !important;
+    }
+    .input-field:focus {
+      outline: none !important;
+    }
+    
+    .input-field::placeholder {
+      color: white;
+    }
+    
+    /* Firefox */
+    .input-field::-moz-placeholder {
+      color: white;
+    }
+    
+    /* Webkit */
+    .input-field::-webkit-input-placeholder {
+      color: white;
+    }
+    
+    /* Microsoft Edge */
+    .input-field::-ms-input-placeholder {
+      color: white;
+    }
+    .send-button {
+      background-color: #c7c7c7 !important;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    .send-button:hover {
+      background-color: white;
+      color: #5e5d5d;
+      border: none;
+    }
+    .send-button:active{
+      background-color: white;
+      color: #5e5d5d;
+      border: none;
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+    <div class="option-container">
+      <div class="option-slider"></div>
+      <div class="option" data-option="1">legends</div>
+      <div class="option" data-option="2">Teachers</div>
+      <div class="option" data-option="3">GPT 3.5</div>
+      <div class="option" data-option="4">GPT 4</div>
+    </div>
+  
+
+      <div class="chatbox-page" data-page="1">
+        <div class="container-chatbox">
+            <div class="left-container">
+              <div class="legend-select">
+                <button id="nikola-tesla-button">Nikola Tesla</button>
+                <button id="beethoven-button">Beethoven</button>
+                <button id="george-washington-button">George Washington</button>
+                <button id="confucius-button">Confucius</button>
+                <button id="albert-einstein-button">Albert Einstein</button>
+              </div>
+            </div>
+            <div class="right-container">
+                <div class="legend-topbar"></div> 
+                    <div class="chatbox">
+                    <!-- Chatbox content goes here -->
+                </div>
+              <div class="input-container">
+                <input id="message-input" class="input-field" type="text" placeholder="Type your message..." autocomplete="off">
+                <button id="send-button" class="send-button">Send</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      <div class="chatbox-page" data-page="2">
+      <div class="container-chatbox">
+        <div class="left-container">
+          <div class="teacher-select">
+            <button id="teacher-1-button">Teacher 1</button>
+            <button id="teacher-2-button">Teacher 2</button>
+            <button id="teacher-3-button">Teacher 3</button>
+            <button id="teacher-4-button">Teacher 4</button>
+          </div>
+        </div>
+        <div class="right-container">
+            <div class="teacher-topbar"></div> 
+                <div class="chatbox">
+                <!-- Chatbox content goes here -->
+            </div>
+          <div class="input-container">
+            <input id="message-input" class="input-field" type="text" placeholder="Type your message..." autocomplete="off">
+            <button id="send-button" class="send-button">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+      <div class="chatbox-page" data-page="3">Page 3</div>
+      <div class="chatbox-page" data-page="4">Page 4</div>
+    </div>
+
+    <script>
+      // 创建一个名为 roles 的常量存储各个按钮对应的信息
+      const roles = {
+          "nikola-tesla-button": {
+              name: "TESLA",
+              profilePicUrl: "https://www.cookiecake.fun/wp-content/uploads/2023/04/Nikola-Tesla-thumbnail.png"
+          },
+          "beethoven-button": {
+              name: "BEETHOVEN",
+              profilePicUrl: "https://www.cookiecake.fun/wp-content/uploads/2023/04/bethoven-thumbnail.png"
+          },
+          "george-washington-button": {
+              name: "WASHINGTON",
+              profilePicUrl: "https://www.cookiecake.fun/wp-content/uploads/2023/04/george-washington-thumbnail.png"
+          },
+          "confucius-button": {
+              name: "CONFUCIUS",
+              profilePicUrl: "https://www.cookiecake.fun/wp-content/uploads/2023/05/confucius-thumbnail.png"
+          },
+          "albert-einstein-button": {
+              name: "EINSTEIN",
+              profilePicUrl: "https://www.cookiecake.fun/wp-content/uploads/2023/04/einstein-thumbnail.png"
+          },
+          "teacher-1-button": {
+              name: "TEACHER1",
+              profilePicUrl: "https://www.cookiecake.fun/wp-content/uploads/2023/04/Nikola-Tesla-thumbnail.png"
+          },
+          "teacher-2-button": {
+              name: "TEACHER2",
+              profilePicUrl: "https://www.cookiecake.fun/wp-content/uploads/2023/04/george-washington-thumbnail.png"
+          },
+          "teacher-3-button": {
+              name: "TEACHER3",
+              profilePicUrl: "https://www.cookiecake.fun/wp-content/uploads/2023/05/confucius-thumbnail.png"
+          },
+          "teacher-4-button": {
+              name: "TEACHER4",
+              profilePicUrl: "https://www.cookiecake.fun/wp-content/uploads/2023/04/Nikola-Tesla-thumbnail.png"
+          }
+      };
+  
+
+  
+      // 获取所有的选项
+      const options = document.querySelectorAll('.option');// 获取所有的选项
+      const slider = document.querySelector('.option-slider'); // 获取滑块
+  
+      options.forEach(option => {// 为每个选项添加点击事件
+          option.addEventListener('click', function() { // 点击选项后的操作
+              const optionNumber = this.getAttribute('data-option'); // 获取选项的编号
+              slider.style.left = `${(optionNumber - 1) * 125}px`;
+  
+              const activePage = document.querySelector('.chatbox-page.active');// 获取当前活跃的页面
+              if (activePage) {
+                  activePage.classList.remove('active');
+              }
+  
+              const newActivePage = document.querySelector(`.chatbox-page[data-page="${optionNumber}"]`);
+              newActivePage.classList.add('active');
+          });
+      });
+  
+      // 设置默认页面
+      document.querySelector('.chatbox-page[data-page="1"]').classList.add('active');
+  
+      // 文档加载完毕后的操作
+      
+      const button = document.getElementById("send-button");// 发送按钮
+      const input = document.getElementById("message-input");
+      const legendButtons = document.querySelectorAll(".legend-select button");// 角色选择按钮
+      const legendTopbar = document.querySelector(".legend-topbar");// 顶部的角色选择栏
+      const legendTopbarName = document.createElement("div");   // 顶部的角色名字 创建的是一个 div 元素
+      legendTopbar.appendChild(legendTopbarName);  // 将角色名字添加到顶部的角色选择栏中
+
+      const teacherButtons = document.querySelectorAll(".teacher-select button");// 教师选择按钮
+      const teacherTopbar = document.querySelector(".teacher-topbar");// 顶部的教师选择栏
+      const teacherTopbarName = document.createElement("div");   // 顶部的教师名字 创建的是一个 div 元素
+      teacherTopbar.appendChild(teacherTopbarName);  // 将教师名字添加到顶部的教师选择栏中
+
+      let selectedRole = null;  // 选中的角色
+      let RoleProfilePicUrl = null; // 角色头像
+      let Role_name = null; // 角色名字
+      let RoleDialogs = {};   // 存储每个角色的对话
+      let imageCache = {}; // 存储预加载的图片
+
+      // 初始禁用输入和按钮
+      input.disabled = true; 
+      button.disabled = true;
+
+      // 处理角色选择的函数
+      function handleRoleSelection(RoleButton) { // 传入的参数是角色选择按钮
+          if (selectedRole) {
+              selectedRole.classList.remove("selected");// 移除之前选中的角色的选中状态
+              const chatbox = document.querySelector(".chatbox");// 获取聊天框
+              RoleDialogs[selectedRole.id] = chatbox.innerHTML;// 将聊天框中的内容存储到 RoleDialogs 中
+          }
+
+          RoleButton.classList.add("selected");// 为当前选中的角色添加选中状态
+          selectedRole = RoleButton;// 将当前选中的角色赋值给 selectedRole
+
+          const chatbox = document.querySelector(".chatbox");// 获取聊天框
+          if (RoleDialogs[RoleButton.id]) {// 如果当前选中的角色的对话已经存在
+              chatbox.innerHTML = RoleDialogs[RoleButton.id];// 将聊天框中的内容替换为当前选中的角色的对话
+          } else {
+              chatbox.innerHTML = '';
+          }
+
+          const RoleName = RoleButton.id;// 获取当前选中的角色的 id
+          if (roles[RoleName]) {// 如果当前选中的角色的 id 在 roles 中
+              Role_name = roles[RoleName].name;// 将当前选中的角色的名字赋值给 Role_name
+              RoleProfilePicUrl = roles[RoleName].profilePicUrl;// 将当前选中的角色的头像赋值给 RoleProfilePicUrl
+          } else {
+              RoleProfilePicUrl = ""; // 如果没有匹配的角色名则清除头像图片源
+          }
+          let roleTopbarPic = null
+          // 预加载图片
+          const img = new Image();
+          img.onload = function() {// 图片加载完毕后的操作
+              imageCache[RoleButton.id] = img;// 将加载完毕的图片存储到 imageCache 中
+              // 更新顶部栏中的角色头像
+              var pageName = document.querySelector('.chatbox-page.active').getAttribute('data-page');
+                 switch (pageName) {
+                      case '1':
+                        // 执行对应于'legends'页面的代码
+                        roleTopbarPic = legendTopbar.querySelector(".legend-topbar-profile-picture");// 获取顶部栏中的角色头像
+                        if (!roleTopbarPic) {// 如果顶部栏中没有角色头像
+                                roleTopbarPic = img.cloneNode(true);// 克隆图片
+                                roleTopbarPic.classList.add("legend-topbar-profile-picture");// 为克隆的图片添加类名
+                                legendTopbar.insertBefore(roleTopbarPic, legendTopbarName); // 将克隆的图片添加到顶部栏中
+                                   } else {
+                                roleTopbarPic.src = img.src;// 如果顶部栏中有角色头像则更新角色头像
+                                      }
+                        break;
+                      case '2':
+                        // 执行对应于'Teachers'页面的代码
+                        roleTopbarPic = teacherTopbar.querySelector(".teacher-topbar-profile-picture");
+                        if (!roleTopbarPic) {// 如果顶部栏中没有角色头像
+                                roleTopbarPic = img.cloneNode(true);// 克隆图片
+                                roleTopbarPic.classList.add("teacher-topbar-profile-picture");// 为克隆的图片添加类名
+                                teacherTopbar.insertBefore(roleTopbarPic,teacherTopbarName); // 将克隆的图片添加到顶部栏中
+                                   } else {
+                                roleTopbarPic.src = img.src;// 如果顶部栏中有角色头像则更新角色头像
+                                      }
+                        break;
+                      case '3':
+                        // 执行对应于'GPT 3.5'页面的代码
+                  
+                        break;
+                      case '4':
+                        // 执行对应于'GPT 4'页面的代码
+                    
+                        break;
+                      default:
+                        console.log('Unknown page');
+            }
+              
+          
+          }
+          img.src = RoleProfilePicUrl;
+
+          // 当选择一个角色后，启用输入和按钮
+          input.disabled = false;
+          button.disabled = false;
+      }
+
+      // 处理角色按钮点击的函数
+      function handleLegendButtonClick(event) {
+        
+          const selectedRoleButton = event.target;
+          legendTopbarName.textContent = selectedRoleButton.textContent; // 更新顶部栏的文本
+          handleRoleSelection(selectedRoleButton);
+          console.log(document.querySelector('.chatbox-page.active').getAttribute('data-page'));
+      }
+      function handTeacherButtonClick(event) {
+          const selectedRoleButton = event.target;
+          teacherTopbarName.textContent = selectedRoleButton.textContent; // 更新顶部栏的文本
+          handleRoleSelection(selectedRoleButton);
+          console.log(document.querySelector('.chatbox-page.active').getAttribute('data-page'));
+      }
+
+      legendButtons.forEach((button) => {
+          button.addEventListener("click", handleLegendButtonClick);
+      });
+      teacherButtons.forEach((button) => {
+          button.addEventListener("click", handTeacherButtonClick);
+      });
+
+      // 老师对话的stream函数
+      async function startTeacherStream(role,message) {
+          const response = await fetch('https://www.cookiecake.fun/checkchat', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ content: message, role: role })
+          });
+
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder('utf-8');
+
+          const replyText = document.createElement("div");
+          replyText.classList.add("text");
+
+          let ReplyContainer = null; // 存储角色回复的容器
+
+          // 处理文本函数
+          const processText = async function ({ done, value }) {
+              if (done) {
+                  console.log('Stream complete');
+                  return;
+              }
+
+              const result = decoder.decode(value, { stream: true });
+
+              // 按行分割
+              const lines = result.split('\n');
+
+              // 累积角色的回复
+              let Reply = '';
+
+              // 对每一行进行处理
+              for (const line of lines) {
+                  // 如果行为空则忽略
+                  if (line.trim() === '') continue;
+
+                  try {
+                      // 将行解析为 JSON
+                      const data = JSON.parse(line);
+
+                      // 检查是否存在内容
+                      if (data.choices && data.choices[0] && data.choices[0].delta && data.choices[0].delta.content) {
+                          // 将内容附加到累积的回复中
+                          Reply += data.choices[0].delta.content;
+                      }
+                  } catch (e) {
+                      console.log('Could not parse line: ', line);
+                  }
+              }
+              replyText.textContent += Reply;
+
+              // 如果角色回复的元素不存在，创建一个新的 div 元素
+              if (!ReplyContainer) {
+                  ReplyContainer = document.createElement("div");
+                  ReplyContainer.classList.add("message");
+                  ReplyContainer.classList.add("teacher");
+                  ReplyContainer.classList.add("stream"); // 添加流效果的类
+
+                  // 创建一个新的 div 元素，作为角色头像的容器
+                  const ProfilePicContainer = document.createElement("div");
+                  ProfilePicContainer.classList.add("teacher-profile-pic-container");
+
+                  // 将角色的头像容器附加到角色回复的容器中
+                  ReplyContainer.appendChild(ProfilePicContainer);
+                  ReplyContainer.appendChild(replyText);
+
+                  // 将角色回复的容器附加到聊天框中
+                  const chatbox = document.querySelector(".chatbox");
+                  chatbox.appendChild(ReplyContainer);
+
+                  // 将图片元素分配给变量
+                  let teacherProfilePic = ReplyContainer.querySelector(".teacher-profile-pic");
+
+                  // 如果角色头像元素不存在，创建并附加它
+                  if (!teacherProfilePic) {
+                     teacherProfilePic = imageCache[selectedRole.id].cloneNode(true);
+                     teacherProfilePic.classList.add("teacher-profile-pic");
+                      const ProfilePicContainer = ReplyContainer.querySelector(".teacher-profile-pic-container");
+                      ProfilePicContainer.appendChild(teacherProfilePic);
+                  }
+              }
+
+              // 滚动到聊天框底部
+              const chatbox = document.querySelector(".chatbox");
+              chatbox.scrollTop = chatbox.scrollHeight;
+
+              if (!done) {
+                  return reader.read().then(processText);
+              }
+          };
+
+          reader.read().then(processText);
+      }
+
+      async function startlegendStream(role,message) {
+          const response = await fetch('https://www.cookiecake.fun/checkchat', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ content: message, role: role })
+          });
+
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder('utf-8');
+
+          const replyText = document.createElement("div");
+          replyText.classList.add("text");
+
+          let ReplyContainer = null; // 存储角色回复的容器
+
+          // 处理文本函数
+          const processText = async function ({ done, value }) {
+              if (done) {
+                  console.log('Stream complete');
+                  return;
+              }
+
+              const result = decoder.decode(value, { stream: true });
+
+              // 按行分割
+              const lines = result.split('\n');
+
+              // 累积角色的回复
+              let Reply = '';
+
+              // 对每一行进行处理
+              for (const line of lines) {
+                  // 如果行为空则忽略
+                  if (line.trim() === '') continue;
+
+                  try {
+                      // 将行解析为 JSON
+                      const data = JSON.parse(line);
+
+                      // 检查是否存在内容
+                      if (data.choices && data.choices[0] && data.choices[0].delta && data.choices[0].delta.content) {
+                          // 将内容附加到累积的回复中
+                          Reply += data.choices[0].delta.content;
+                      }
+                  } catch (e) {
+                      console.log('Could not parse line: ', line);
+                  }
+              }
+              replyText.textContent += Reply;
+
+              // 如果角色回复的元素不存在，创建一个新的 div 元素
+              if (!ReplyContainer) {
+                  ReplyContainer = document.createElement("div");
+                  ReplyContainer.classList.add("message");
+                  ReplyContainer.classList.add("legend");
+                  ReplyContainer.classList.add("stream"); // 添加流效果的类
+
+                  // 创建一个新的 div 元素，作为角色头像的容器
+                  const ProfilePicContainer = document.createElement("div");
+                  ProfilePicContainer.classList.add("legend-profile-pic-container");
+
+                  // 将角色的头像容器附加到角色回复的容器中
+                  ReplyContainer.appendChild(ProfilePicContainer);
+                  ReplyContainer.appendChild(replyText);
+
+                  // 将角色回复的容器附加到聊天框中
+                  const chatbox = document.querySelector(".chatbox");
+                  chatbox.appendChild(ReplyContainer);
+
+                  // 将图片元素分配给变量
+                  let legendProfilePic = ReplyContainer.querySelector(".legend-profile-pic");
+
+                  // 如果角色头像元素不存在，创建并附加它
+                  if (!legendProfilePic) {
+                      legendProfilePic = imageCache[selectedRole.id].cloneNode(true);
+                      legendProfilePic.classList.add("legend-profile-pic");
+                      const ProfilePicContainer = ReplyContainer.querySelector(".legend-profile-pic-container");
+                      ProfilePicContainer.appendChild(legendProfilePic);
+                  }
+              }
+
+              // 滚动到聊天框底部
+              const chatbox = document.querySelector(".chatbox");
+              chatbox.scrollTop = chatbox.scrollHeight;
+
+              if (!done) {
+                  return reader.read().then(processText);
+              }
+          };
+
+          reader.read().then(processText);
+      }
+      // 发送消息函数
+      function sendMessage() {
+          const message = input.value.trim();
+
+          if (message === '') return;
+
+          const messageContainer = document.createElement("div");
+          messageContainer.classList.add("message");
+          messageContainer.classList.add("user");
+
+          const messageText = document.createElement("div");
+          messageText.classList.add("text");
+          messageText.textContent = message;
+
+          const userProfilePicContainer = document.createElement("div");
+          userProfilePicContainer.classList.add("user-profile-pic-container");
+
+          const userProfilePic = document.createElement("img");
+          userProfilePic.classList.add("user-profile-pic");
+          userProfilePic.src = "https://www.cookiecake.fun/wp-content/uploads/2023/05/team6-2.jpg";
+
+          userProfilePicContainer.appendChild(userProfilePic);
+          messageContainer.appendChild(messageText);
+          messageContainer.appendChild(userProfilePicContainer);
+
+          const chatbox = document.querySelector(".chatbox");
+          chatbox.appendChild(messageContainer);
+
+          chatbox.scrollTop = chatbox.scrollHeight;
+
+          input.value = '';
+          switch (document.querySelector('.chatbox-page.active').getAttribute('data-page')) {
+                      case '1':
+                        // 执行对应于'legends'页面的代码
+                        startlegendStream(Role_name,message);
+                        break;
+                      case '2':
+                        // 执行对应于'teacher'页面的代码
+                        startTeacherStream(Role_name,message);
+                        break;
+                      case '3':
+                        break;
+                      case '4':
+                        break;
+      }
+    }
+      button.addEventListener("click", sendMessage);
+      input.addEventListener("keydown", function(event) {
+          if (event.key === "Enter") {
+              event.preventDefault();
+              sendMessage();
+          }
+      });
+     
+  </script>
+  
+</body>
+</html>
