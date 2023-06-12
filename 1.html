@@ -72,7 +72,8 @@
     }
     
     /* CSS for the chatbox */      
-    .chatbox {
+    .chatbox-legend,
+    .chatbox-teacher{
       overflow-x: auto; /* Add this line */
       height: 100%; /* Adjust height based on topbar and input field heights */
         
@@ -379,7 +380,7 @@
     <div class="container">
     <div class="option-container">
       <div class="option-slider"></div>
-      <div class="option" data-option="1">Legends</div>
+      <div class="option" data-option="1">legends</div>
       <div class="option" data-option="2">Teachers</div>
       <div class="option" data-option="3">GPT 3.5</div>
       <div class="option" data-option="4">GPT 4</div>
@@ -399,7 +400,7 @@
             </div>
             <div class="right-container">
                 <div class="legend-topbar"></div> 
-                    <div class="chatbox">
+                    <div class="chatbox-legend">
                     <!-- Chatbox content goes here -->
                 </div>
               <div class="input-container">
@@ -421,12 +422,12 @@
         </div>
         <div class="right-container">
             <div class="teacher-topbar"></div> 
-                <div class="chatbox">
+                <div class="chatbox-teacher">
                 <!-- Chatbox content goes here -->
             </div>
           <div class="input-container">
-            <input id="message-input" class="input-field" type="text" placeholder="Type your message..." autocomplete="off">
-            <button id="send-button" class="send-button">Send</button>
+            <input id="teacher-message-input" class="input-field" type="text" placeholder="Type your message..." autocomplete="off">
+            <button id="teacher-send-button" class="send-button">Send</button>
           </div>
         </div>
       </div>
@@ -436,8 +437,8 @@
     </div>
 
     <script>
-      // 创建一个名为 legends 的常量存储各个按钮对应的信息
-      const legends = {
+      // 创建一个名为 roles 的常量存储各个按钮对应的信息
+      const roles = {
           "nikola-tesla-button": {
               name: "TESLA",
               profilePicUrl: "https://www.cookiecake.fun/wp-content/uploads/2023/04/Nikola-Tesla-thumbnail.png"
@@ -452,44 +453,43 @@
           },
           "confucius-button": {
               name: "CONFUCIUS",
-              profilePicUrl: "https://www.cookiecake.fun/wp-content/uploads/2023/05/confucius-thumbnail.png"
+              profilePicUrl: "https://www.cookiecake.fun/wp-content/uploads/2023/04/einstein-thumbnail.png"
           },
           "albert-einstein-button": {
               name: "EINSTEIN",
               profilePicUrl: "https://www.cookiecake.fun/wp-content/uploads/2023/04/einstein-thumbnail.png"
-          }
-      };
-  
-      // 创建一个名为 teachers 的常量存储教师按钮对应的信息
-      const teachers = {
+          },
           "teacher-1-button": {
               name: "TEACHER1",
-              profilePicUrl: "https://www.cookiecake.fun/wp-content/uploads/2023/04/TEACHER-1-thumbnail.png"
+              profilePicUrl: "https://www.cookiecake.fun/wp-content/uploads/2023/04/Nikola-Tesla-thumbnail.png"
           },
           "teacher-2-button": {
               name: "TEACHER2",
-              profilePicUrl: "https://www.cookiecake.fun/wp-content/uploads/2023/04/TEACHER-2-thumbnail.png"
+              profilePicUrl: "https://www.cookiecake.fun/wp-content/uploads/2023/04/george-washington-thumbnail.png"
           },
           "teacher-3-button": {
               name: "TEACHER3",
-              profilePicUrl: "https://www.cookiecake.fun/wp-content/uploads/2023/04/TEACHER-3-thumbnail.png"
+              profilePicUrl: "https://www.cookiecake.fun/wp-content/uploads/2023/04/einstein-thumbnail.png"
           },
           "teacher-4-button": {
               name: "TEACHER4",
-              profilePicUrl: "https://www.cookiecake.fun/wp-content/uploads/2023/04/TEACHER-4-thumbnail.png"
+              profilePicUrl: "https://www.cookiecake.fun/wp-content/uploads/2023/04/Nikola-Tesla-thumbnail.png"
           }
       };
   
-      // 获取所有的选项
-      const options = document.querySelectorAll('.option');
-      const slider = document.querySelector('.option-slider');
+
   
-      options.forEach(option => {
-          option.addEventListener('click', function() {
-              const optionNumber = this.getAttribute('data-option');
+      // 获取所有的选项
+      const options = document.querySelectorAll('.option');// 获取所有的选项
+      const slider = document.querySelector('.option-slider'); // 获取滑块
+      
+  
+      options.forEach(option => {// 为每个选项添加点击事件
+          option.addEventListener('click', function() { // 点击选项后的操作
+              const optionNumber = this.getAttribute('data-option'); // 获取选项的编号
               slider.style.left = `${(optionNumber - 1) * 125}px`;
   
-              const activePage = document.querySelector('.chatbox-page.active');
+              const activePage = document.querySelector('.chatbox-page.active');// 获取当前活跃的页面
               if (activePage) {
                   activePage.classList.remove('active');
               }
@@ -503,218 +503,405 @@
       document.querySelector('.chatbox-page[data-page="1"]').classList.add('active');
   
       // 文档加载完毕后的操作
-      document.addEventListener("DOMContentLoaded", function() {
-          const button = document.getElementById("send-button");
-          const input = document.getElementById("message-input");
-          const legendButtons = document.querySelectorAll(".legend-select button");
-          const legendTopbar = document.querySelector(".legend-topbar");
-          const legendTopbarName = document.createElement("div"); 
-          legendTopbar.appendChild(legendTopbarName);
-  
-          let selectedLegend = null;
-          let legendProfilePicUrl = null;
-          let legend_name = null;
-          let legendDialogs = {};   // 存储每个角色的对话
-          let imageCache = {}; // 存储预加载的图片
-  
-          // 初始禁用输入和按钮
-          input.disabled = true;
-          button.disabled = true;
-  
-          // 处理角色选择的函数
-          function handleLegendSelection(legendButton) { 
-              if (selectedLegend) {
-                  selectedLegend.classList.remove("selected");
-                  const chatbox = document.querySelector(".chatbox");
-                  legendDialogs[selectedLegend.id] = chatbox.innerHTML;
-              }
-  
-              legendButton.classList.add("selected");
-              selectedLegend = legendButton;
-  
-              const chatbox = document.querySelector(".chatbox");
-              if (legendDialogs[legendButton.id]) {
-                  chatbox.innerHTML = legendDialogs[legendButton.id];
-              } else {
-                  chatbox.innerHTML = '';
-              }
-  
-              const legendName = legendButton.id;
-              if (legends[legendName]) {
-                  legend_name = legends[legendName].name;
-                  legendProfilePicUrl = legends[legendName].profilePicUrl;
-              } else {
-                  legendProfilePicUrl = ""; // 如果没有匹配的角色名则清除头像图片源
-              }
-  
-              // 预加载图片
-              const img = new Image();
-              img.onload = function() {
-                  imageCache[legendButton.id] = img;
-                  // 更新顶部栏中的角色头像
-                  let legendTopbarPic = legendTopbar.querySelector(".legend-topbar-profile-picture");
-                  if (!legendTopbarPic) {
-                      legendTopbarPic = img.cloneNode(true);
-                      legendTopbarPic.classList.add("legend-topbar-profile-picture");
-                      legendTopbar.insertBefore(legendTopbarPic, legendTopbarName); // 插入在角色名称前
-                  } else {
-                      legendTopbarPic.src = img.src;
-                  }
-              }
-              img.src = legendProfilePicUrl;
-  
-              // 当选择一个角色后，启用输入和按钮
-              input.disabled = false;
-              button.disabled = false;
+      
+      const Button_legend = document.getElementById("send-button");// 发送按钮      
+      const Button_teacher = document.getElementById("teacher-send-button");// 发送按钮
+      const input_legend = document.getElementById("message-input");
+      const input_teacher = document.getElementById("teacher-message-input");
+
+      const legendButtons = document.querySelectorAll(".legend-select button");// 角色选择按钮
+      const legendTopbar = document.querySelector(".legend-topbar");// 顶部的角色选择栏
+      const legendTopbarName = document.createElement("div");   // 顶部的角色名字 创建的是一个 div 元素
+      legendTopbar.appendChild(legendTopbarName);  // 将角色名字添加到顶部的角色选择栏中
+
+      const teacherButtons = document.querySelectorAll(".teacher-select button");// 教师选择按钮
+      const teacherTopbar = document.querySelector(".teacher-topbar");// 顶部的教师选择栏
+      const teacherTopbarName = document.createElement("div");   // 顶部的教师名字 创建的是一个 div 元素
+      teacherTopbar.appendChild(teacherTopbarName);  // 将教师名字添加到顶部的教师选择栏中
+      
+      let chatbox = null;
+
+      let selectedRole = null;  // 选中的角色
+      let RoleProfilePicUrl = null; // 角色头像
+      let Role_name = null; // 角色名字
+      let RoleDialogs = {};   // 存储每个角色的对话
+      let imageCache = {}; // 存储预加载的图片
+
+      // 初始禁用输入和按钮
+      //input.disabled = true; 
+      //Button.disabled = true;
+
+      // 处理角色选择的函数
+      function handleRoleSelection(RoleButton) { // 传入的参数是角色选择按钮
+          
+          
+          const RoleName = RoleButton.id;// 获取当前选中的角色的 id
+          if (roles[RoleName]) {// 如果当前选中的角色的 id 在 roles 中
+              Role_name = roles[RoleName].name;// 将当前选中的角色的名字赋值给 Role_name
+              RoleProfilePicUrl = roles[RoleName].profilePicUrl;// 将当前选中的角色的头像赋值给 RoleProfilePicUrl
+          } else {
+              RoleProfilePicUrl = ""; // 如果没有匹配的角色名则清除头像图片源
           }
-  
-          // 处理角色按钮点击的函数
-          function handleLegendButtonClick(event) {
-              const selectedLegendButton = event.target;
-              legendTopbarName.textContent = selectedLegendButton.textContent; // 更新顶部栏的文本
-              handleLegendSelection(selectedLegendButton);
+          let roleTopbarPic = null;// 预加载图片
+          const img = new Image();
+          img.onload = function() {// 图片加载完毕后的操作
+              imageCache[RoleButton.id] = img;// 将加载完毕的图片存储到 imageCache 中
+              // 更新顶部栏中的角色头像
+              var pageName = document.querySelector('.chatbox-page.active').getAttribute('data-page');
+                 switch (pageName) {
+                      case '1':
+                        // 执行对应于'legends'页面的代码
+                        roleTopbarPic = legendTopbar.querySelector(".legend-topbar-profile-picture");// 获取顶部栏中的角色头像
+                        chatbox = document.querySelector(".chatbox-legend");
+                        if (!roleTopbarPic) {// 如果顶部栏中没有角色头像
+                                roleTopbarPic = img.cloneNode(true);// 克隆图片
+                                roleTopbarPic.classList.add("legend-topbar-profile-picture");// 为克隆的图片添加类名
+                                legendTopbar.insertBefore(roleTopbarPic, legendTopbarName); // 将克隆的图片添加到顶部栏中
+                                   } else {
+                                roleTopbarPic.src = img.src;// 如果顶部栏中有角色头像则更新角色头像
+                                      }
+                        break;
+                      case '2':
+                        // 执行对应于'Teachers'页面的代码
+                        roleTopbarPic = teacherTopbar.querySelector(".teacher-topbar-profile-picture");
+                        chatbox = document.querySelector(".chatbox-teacher");
+                        if (!roleTopbarPic) {// 如果顶部栏中没有角色头像
+                                roleTopbarPic = img.cloneNode(true);// 克隆图片
+                                roleTopbarPic.classList.add("teacher-topbar-profile-picture");// 为克隆的图片添加类名
+                                teacherTopbar.insertBefore(roleTopbarPic,teacherTopbarName); // 将克隆的图片添加到顶部栏中
+                                   } else {
+                                roleTopbarPic.src = img.src;// 如果顶部栏中有角色头像则更新角色头像
+                                      }
+                        break;
+                      case '3':
+                        // 执行对应于'GPT 3.5'页面的代码
+                  
+                        break;
+                      case '4':
+                        // 执行对应于'GPT 4'页面的代码
+                    
+                        break;
+                      default:
+                        console.log('Unknown page');
+            }
+
+            if (selectedRole) {
+              selectedRole.classList.remove("selected");// 移除之前选中的角色的选中状态
+              RoleDialogs[selectedRole.id] = chatbox.innerHTML;// 将聊天框中的内容存储到 RoleDialogs 中
+            }
+
+          RoleButton.classList.add("selected");// 为当前选中的角色添加选中状态
+          selectedRole = RoleButton;// 将当前选中的角色赋值给 selectedRole
+
+          if (RoleDialogs[RoleButton.id]) {// 如果当前选中的角色的对话已经存在
+              chatbox.innerHTML = RoleDialogs[RoleButton.id];// 将聊天框中的内容替换为当前选中的角色的对话
+          } else {
+              chatbox.innerHTML = '';
           }
-  
-          legendButtons.forEach((button) => {
-              button.addEventListener("click", handleLegendButtonClick);
-          });
-  
-          // 开始流函数
-          async function startStream(role,message) {
-              const response = await fetch('https://www.cookiecake.fun/checkchat', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ content: message, role: role })
-              });
-  
-              const reader = response.body.getReader();
-              const decoder = new TextDecoder('utf-8');
-  
-              const replyText = document.createElement("div");
-              replyText.classList.add("text");
-  
-              let ReplyContainer = null; // 存储角色回复的容器
-  
-              // 处理文本函数
-              const processText = async function ({ done, value }) {
-                  if (done) {
-                      console.log('Stream complete');
-                      return;
-                  }
-  
-                  const result = decoder.decode(value, { stream: true });
-  
-                  // 按行分割
-                  const lines = result.split('\n');
-  
-                  // 累积角色的回复
-                  let Reply = '';
-  
-                  // 对每一行进行处理
-                  for (const line of lines) {
-                      // 如果行为空则忽略
-                      if (line.trim() === '') continue;
-  
-                      try {
-                          // 将行解析为 JSON
-                          const data = JSON.parse(line);
-  
-                          // 检查是否存在内容
-                          if (data.choices && data.choices[0] && data.choices[0].delta && data.choices[0].delta.content) {
-                              // 将内容附加到累积的回复中
-                              Reply += data.choices[0].delta.content;
-                          }
-                      } catch (e) {
-                          console.log('Could not parse line: ', line);
-                      }
-                  }
-                  replyText.textContent += Reply;
-  
-                  // 如果角色回复的元素不存在，创建一个新的 div 元素
-                  if (!ReplyContainer) {
-                      ReplyContainer = document.createElement("div");
-                      ReplyContainer.classList.add("message");
-                      ReplyContainer.classList.add("legend");
-                      ReplyContainer.classList.add("stream"); // 添加流效果的类
-  
-                      // 创建一个新的 div 元素，作为角色头像的容器
-                      const ProfilePicContainer = document.createElement("div");
-                      ProfilePicContainer.classList.add("legend-profile-pic-container");
-  
-                      // 将角色的头像容器附加到角色回复的容器中
-                      ReplyContainer.appendChild(ProfilePicContainer);
-                      ReplyContainer.appendChild(replyText);
-  
-                      // 将角色回复的容器附加到聊天框中
-                      const chatbox = document.querySelector(".chatbox");
-                      chatbox.appendChild(ReplyContainer);
-  
-                      // 将图片元素分配给变量
-                      let legendProfilePic = ReplyContainer.querySelector(".legend-profile-pic");
-  
-                      // 如果角色头像元素不存在，创建并附加它
-                      if (!legendProfilePic) {
-                          legendProfilePic = imageCache[selectedLegend.id].cloneNode(true);
-                          legendProfilePic.classList.add("legend-profile-pic");
-                          const ProfilePicContainer = ReplyContainer.querySelector(".legend-profile-pic-container");
-                          ProfilePicContainer.appendChild(legendProfilePic);
-                      }
-                  }
-  
-                  // 滚动到聊天框底部
-                  const chatbox = document.querySelector(".chatbox");
-                  chatbox.scrollTop = chatbox.scrollHeight;
-  
-                  if (!done) {
-                      return reader.read().then(processText);
-                  }
-              };
-  
-              reader.read().then(processText);
+          console.log(RoleDialogs[RoleButton.id]);    
+          
           }
-  
-          // 发送消息函数
-          function sendMessage() {
-              const message = input.value.trim();
-  
-              if (message === '') return;
-  
-              const messageContainer = document.createElement("div");
-              messageContainer.classList.add("message");
-              messageContainer.classList.add("user");
-  
-              const messageText = document.createElement("div");
-              messageText.classList.add("text");
-              messageText.textContent = message;
-  
-              const userProfilePicContainer = document.createElement("div");
-              userProfilePicContainer.classList.add("user-profile-pic-container");
-  
-              const userProfilePic = document.createElement("img");
-              userProfilePic.classList.add("user-profile-pic");
-              userProfilePic.src = "https://www.cookiecake.fun/wp-content/uploads/2023/05/team6-2.jpg";
-  
-              userProfilePicContainer.appendChild(userProfilePic);
-              messageContainer.appendChild(messageText);
-              messageContainer.appendChild(userProfilePicContainer);
-  
-              const chatbox = document.querySelector(".chatbox");
-              chatbox.appendChild(messageContainer);
-  
-              chatbox.scrollTop = chatbox.scrollHeight;
-  
-              input.value = '';
-              startStream(legend_name,message);
-          }
-  
-          button.addEventListener("click", sendMessage);
-          input.addEventListener("keydown", function(event) {
-              if (event.key === "Enter") {
-                  event.preventDefault();
-                  sendMessage();
-              }
-          });
+          
+          img.src = RoleProfilePicUrl;
+
+          // 当选择一个角色后，启用输入和按钮
+          //input.disabled = false;
+          //Button.disabled = false;
+        
+      }
+
+      // 处理角色按钮点击的函数
+      function handleLegendButtonClick(event) {
+        
+          const selectedRoleButton = event.target;
+          legendTopbarName.textContent = selectedRoleButton.textContent; // 更新顶部栏的文本
+          handleRoleSelection(selectedRoleButton);
+          
+      }
+      function handTeacherButtonClick(event) {
+          const selectedRoleButton = event.target;
+          teacherTopbarName.textContent = selectedRoleButton.textContent; // 更新顶部栏的文本
+          handleRoleSelection(selectedRoleButton);
+          
+      }
+
+      legendButtons.forEach((button) => {
+          button.addEventListener("click", handleLegendButtonClick);
       });
+      teacherButtons.forEach((button) => {
+          button.addEventListener("click", handTeacherButtonClick);
+      });
+
+      // 老师对话的stream函数
+      async function startTeacherStream(role,message) {
+          const response = await fetch('https://www.cookiecake.fun/checkchat', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ content: message, role: role })
+          });
+
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder('utf-8');
+
+          const replyText = document.createElement("div");
+          replyText.classList.add("text");
+
+          let ReplyContainer = null; // 存储角色回复的容器
+
+          // 处理文本函数
+          const processText = async function ({ done, value }) {
+              if (done) {
+                  console.log('Stream complete');
+                  return;
+              }
+
+              const result = decoder.decode(value, { stream: true });
+
+              // 按行分割
+              const lines = result.split('\n');
+
+              // 累积角色的回复
+              let Reply = '';
+
+              // 对每一行进行处理
+              for (const line of lines) {
+                  // 如果行为空则忽略
+                  if (line.trim() === '') continue;
+
+                  try {
+                      // 将行解析为 JSON
+                      const data = JSON.parse(line);
+
+                      // 检查是否存在内容
+                      if (data.choices && data.choices[0] && data.choices[0].delta && data.choices[0].delta.content) {
+                          // 将内容附加到累积的回复中
+                          Reply += data.choices[0].delta.content;
+                      }
+                  } catch (e) {
+                      console.log('Could not parse line: ', line);
+                  }
+              }
+              replyText.textContent += Reply;
+
+              // 如果角色回复的元素不存在，创建一个新的 div 元素
+              if (!ReplyContainer) {
+                  ReplyContainer = document.createElement("div");
+                  ReplyContainer.classList.add("message");
+                  ReplyContainer.classList.add("teacher");
+                  ReplyContainer.classList.add("stream"); // 添加流效果的类
+
+                  // 创建一个新的 div 元素，作为角色头像的容器
+                  const ProfilePicContainer = document.createElement("div");
+                  ProfilePicContainer.classList.add("teacher-profile-pic-container");
+
+                  // 将角色的头像容器附加到角色回复的容器中
+                  ReplyContainer.appendChild(ProfilePicContainer);
+                  ReplyContainer.appendChild(replyText);
+
+                  // 将角色回复的容器附加到聊天框中
+                  
+                  chatbox.appendChild(ReplyContainer);
+
+                  // 将图片元素分配给变量
+                  let teacherProfilePic = ReplyContainer.querySelector(".teacher-profile-pic");
+
+                  // 如果角色头像元素不存在，创建并附加它
+                  if (!teacherProfilePic) {
+                     teacherProfilePic = imageCache[selectedRole.id].cloneNode(true);
+                     teacherProfilePic.classList.add("teacher-profile-pic");
+                      const ProfilePicContainer = ReplyContainer.querySelector(".teacher-profile-pic-container");
+                      ProfilePicContainer.appendChild(teacherProfilePic);
+                  }
+              }
+
+              // 滚动到聊天框底部
+              
+              chatbox.scrollTop = chatbox.scrollHeight;
+
+              if (!done) {
+                  return reader.read().then(processText);
+              }
+          };
+
+          reader.read().then(processText);
+      }
+
+      async function startlegendStream(role,message) {
+          const response = await fetch('https://www.cookiecake.fun/checkchat', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ content: message, role: role })
+          });
+
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder('utf-8');
+
+          const replyText = document.createElement("div");
+          replyText.classList.add("text");
+
+          let ReplyContainer = null; // 存储角色回复的容器
+
+          // 处理文本函数
+          const processText = async function ({ done, value }) {
+              if (done) {
+                  console.log('Stream complete');
+                  return;
+              }
+
+              const result = decoder.decode(value, { stream: true });
+
+              // 按行分割
+              const lines = result.split('\n');
+
+              // 累积角色的回复
+              let Reply = '';
+
+              // 对每一行进行处理
+              for (const line of lines) {
+                  // 如果行为空则忽略
+                  if (line.trim() === '') continue;
+
+                  try {
+                      // 将行解析为 JSON
+                      const data = JSON.parse(line);
+
+                      // 检查是否存在内容
+                      if (data.choices && data.choices[0] && data.choices[0].delta && data.choices[0].delta.content) {
+                          // 将内容附加到累积的回复中
+                          Reply += data.choices[0].delta.content;
+                      }
+                  } catch (e) {
+                      console.log('Could not parse line: ', line);
+                  }
+              }
+              replyText.textContent += Reply;
+
+              // 如果角色回复的元素不存在，创建一个新的 div 元素
+              if (!ReplyContainer) {
+                  ReplyContainer = document.createElement("div");
+                  ReplyContainer.classList.add("message");
+                  ReplyContainer.classList.add("legend");
+                  ReplyContainer.classList.add("stream"); // 添加流效果的类
+
+                  // 创建一个新的 div 元素，作为角色头像的容器
+                  const ProfilePicContainer = document.createElement("div");
+                  ProfilePicContainer.classList.add("legend-profile-pic-container");
+
+                  // 将角色的头像容器附加到角色回复的容器中
+                  ReplyContainer.appendChild(ProfilePicContainer);
+                  ReplyContainer.appendChild(replyText);
+
+                  // 将角色回复的容器附加到聊天框中
+                  
+                  chatbox.appendChild(ReplyContainer);
+
+                  // 将图片元素分配给变量
+                  let legendProfilePic = ReplyContainer.querySelector(".legend-profile-pic");
+
+                  // 如果角色头像元素不存在，创建并附加它
+                  if (!legendProfilePic) {
+                      legendProfilePic = imageCache[selectedRole.id].cloneNode(true);
+                      legendProfilePic.classList.add("legend-profile-pic");
+                      const ProfilePicContainer = ReplyContainer.querySelector(".legend-profile-pic-container");
+                      ProfilePicContainer.appendChild(legendProfilePic);
+                  }
+              }
+
+              // 滚动到聊天框底部
+              
+              chatbox.scrollTop = chatbox.scrollHeight;
+
+              if (!done) {
+                  return reader.read().then(processText);
+              }
+          };
+
+          reader.read().then(processText);
+      }
+      // 发送消息函数
+      function sendLegendMessage() {
+          const message = input_legend.value.trim();
+
+          if (message === '') return;
+
+          const messageContainer = document.createElement("div");
+          messageContainer.classList.add("message");
+          messageContainer.classList.add("user");
+
+          const messageText = document.createElement("div");
+          messageText.classList.add("text");
+          messageText.textContent = message;
+
+          const userProfilePicContainer = document.createElement("div");
+          userProfilePicContainer.classList.add("user-profile-pic-container");
+
+          const userProfilePic = document.createElement("img");
+          userProfilePic.classList.add("user-profile-pic");
+          userProfilePic.src = "https://www.cookiecake.fun/wp-content/uploads/2023/05/team6-2.jpg";
+
+          userProfilePicContainer.appendChild(userProfilePic);
+          messageContainer.appendChild(messageText);
+          messageContainer.appendChild(userProfilePicContainer);
+
+          
+          chatbox.appendChild(messageContainer);
+
+          chatbox.scrollTop = chatbox.scrollHeight;
+
+          input_legend.value = '';
+          startlegendStream(Role_name,message);
+
+    }
+    // 发送teacher函数
+    function sendTeacherMessage() {
+          const message = input_teacher.value.trim();
+
+          if (message === '') return;
+
+          const messageContainer = document.createElement("div");
+          messageContainer.classList.add("message");
+          messageContainer.classList.add("user");
+
+          const messageText = document.createElement("div");
+          messageText.classList.add("text");
+          messageText.textContent = message;
+
+          const userProfilePicContainer = document.createElement("div");
+          userProfilePicContainer.classList.add("user-profile-pic-container");
+
+          const userProfilePic = document.createElement("img");
+          userProfilePic.classList.add("user-profile-pic");
+          userProfilePic.src = "https://www.cookiecake.fun/wp-content/uploads/2023/05/team6-2.jpg";
+
+          userProfilePicContainer.appendChild(userProfilePic);
+          messageContainer.appendChild(messageText);
+          messageContainer.appendChild(userProfilePicContainer);
+
+          
+          chatbox.appendChild(messageContainer);
+
+          chatbox.scrollTop = chatbox.scrollHeight;
+
+          input_teacher.value = '';
+
+          startTeacherStream(Role_name,message);
+
+    }
+    Button_legend.addEventListener("click", sendLegendMessage);
+    Button_teacher.addEventListener("click", sendTeacherMessage);
+    input_legend.addEventListener("keydown", function(event) {
+          if (event.key === "Enter") {
+              event.preventDefault();
+              sendLegendMessage();
+          }
+      });
+      input_teacher.addEventListener("keydown", function(event) {
+          if (event.key === "Enter") {
+              event.preventDefault();
+              sendTeacherMessage();
+          }
+      });
+     
   </script>
   
 </body>
